@@ -1,6 +1,11 @@
 name: Java CI
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'docker-compose.yml'
+      - '.gitignore'
 
 jobs:
   build:
