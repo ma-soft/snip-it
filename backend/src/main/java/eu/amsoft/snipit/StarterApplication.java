@@ -1,4 +1,4 @@
-package eu.amsoft.starter;
+package eu.amsoft.snipit;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springframework.boot.SpringApplication;

@@ -22,6 +22,9 @@
     </modules>
 
     <properties>
+        <sonar.organization>ma-soft</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
         <!--  project variables -->
         <app.version>1.0-SNAPSHOT</app.version>
         <spring-boot.version>2.7.6</spring-boot.version>
@@ -36,7 +39,6 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <springdoc-openapi-ui>1.6.13</springdoc-openapi-ui>
-
 
         <!-- front variables -->
         <node.version>v16.17.1</node.version>

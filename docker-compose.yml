@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo
+    image: ${MONGO_VERIONS-mongo:4.4.2}
     container_name: 'snip-it-db'
     restart: unless-stopped
     environment:
