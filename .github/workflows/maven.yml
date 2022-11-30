@@ -7,9 +7,6 @@ on:
       - 'docker-compose.yml'
       - '.gitignore'
 
-  pull_request:
-    types: [ opened, reopened ]
-
 jobs:
   test:
     runs-on: ubuntu-latest

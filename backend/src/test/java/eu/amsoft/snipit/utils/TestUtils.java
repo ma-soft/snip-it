@@ -10,6 +10,10 @@ import java.util.UUID;
 
 public class TestUtils {
 
+    private TestUtils() {
+        // empêche l'instanciation de la classe
+    }
+
     public static List<SnippetDto> getRandomSnippetDtoList(final int size) {
         final List<SnippetDto> dtos = new ArrayList<>();
 
@@ -23,7 +27,7 @@ public class TestUtils {
                             .build()
             );
         }
-        
+
         return dtos;
     }
 
