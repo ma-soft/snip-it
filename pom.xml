@@ -27,6 +27,7 @@
 
         <!--  project variables -->
         <app.version>1.0-SNAPSHOT</app.version>
+        <sonar.organization>${env.SONAR_ORGANIZATION}</sonar.organization>
         <spring-boot.version>2.7.6</spring-boot.version>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
