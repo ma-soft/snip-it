@@ -41,6 +41,9 @@
         <commons-collections4.version>4.4</commons-collections4.version>
         <springdoc-openapi-ui>1.6.13</springdoc-openapi-ui>
         <test-containers.version>1.17.6</test-containers.version>
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <lombok.verion>1.18.24</lombok.verion>
 
         <!-- front variables -->
         <node.version>v16.17.1</node.version>

@@ -50,4 +50,4 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         run: |
           PROJECT_KEY="${REPOSITORY//\//_}"
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dmaven.test.skip=true -Dsonar.projectKey=$PROJECT_KEY
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$PROJECT_KEY
