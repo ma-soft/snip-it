@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @OpenAPIDefinition
-public class StarterApplication {
+public class SnipitApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(StarterApplication.class, args);
+        SpringApplication.run(SnipitApplication.class, args);
     }
 
 }

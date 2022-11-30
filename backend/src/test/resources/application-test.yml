@@ -4,8 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      host: ${SNIP_IT_DB_USER:localhost}
       username: ${SNIP_IT_DB_USER:root}
       password: ${SNIP_IT_DB_PASSWORD:password}
-      port: ${SNIP_IT_DB_DB_PORT:60017}
       database: ${SNIP_IT_DB_DB_NAME:snip-it}
+      uri: mongodb://127.0.0.1:60017/snip-it
