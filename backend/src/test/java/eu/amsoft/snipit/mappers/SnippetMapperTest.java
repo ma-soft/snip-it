@@ -21,7 +21,7 @@ class SnippetMapperTest {
                 .content(RandomStringUtils.randomAlphabetic(200))
                 .build();
 
-        final SnippetDto snippetDto = SnippetMapper.INSTANCE.mapToDto(snippetModel);
+        final SnippetDto snippetDto = SnippetMapper.INSTANCE.toSnippetDto(snippetModel);
 
         assertThat(snippetDto, notNullValue());
         assertThat(snippetDto.getId(), is(snippetModel.getId()));

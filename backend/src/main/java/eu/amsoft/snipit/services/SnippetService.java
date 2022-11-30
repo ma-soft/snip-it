@@ -17,7 +17,7 @@ public class SnippetService {
 
     public Page<SnippetDto> getAll(final Pageable pageable) {
         final Page<SnippetModel> page = snippetRepository.findAll(pageable);
-        return page.map(SnippetMapper.INSTANCE::mapToDto);
+        return page.map(SnippetMapper.INSTANCE::toSnippetDto);
     }
 
 }

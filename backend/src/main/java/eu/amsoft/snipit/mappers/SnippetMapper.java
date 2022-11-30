@@ -5,10 +5,10 @@ import eu.amsoft.snipit.ressources.dto.SnippetDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface SnippetMapper {
 
     SnippetMapper INSTANCE = Mappers.getMapper(SnippetMapper.class);
 
-    SnippetDto mapToDto(final SnippetModel snippet);
+    SnippetDto toSnippetDto(final SnippetModel snippet);
 }
