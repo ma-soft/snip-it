@@ -43,6 +43,7 @@
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <lombok.verion>1.18.24</lombok.verion>
+        <jacoco.version>0.8.7</jacoco.version>
 
         <!-- front variables -->
         <node.version>v16.17.1</node.version>
