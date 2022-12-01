@@ -1,2 +1,11 @@
 server:
   port: ${APP_PORT:8080}
+  servlet:
+    context-path: /api
+
+spring:
+  data:
+    mongodb:
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      uri: ${DB_URI}

@@ -1,0 +1,9 @@
+server:
+  port: ${APP_PORT:8080}
+
+spring:
+  data:
+    mongodb:
+      username: root
+      password: password
+      uri: mongodb://127.0.0.1:60017/snip-it

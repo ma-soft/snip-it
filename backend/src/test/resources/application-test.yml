@@ -1,0 +1,10 @@
+server:
+  port: ${APP_PORT:8080}
+
+spring:
+  data:
+    mongodb:
+      username: ${SNIP_IT_DB_USER:root}
+      password: ${SNIP_IT_DB_PASSWORD:password}
+      database: ${SNIP_IT_DB_DB_NAME:snip-it}
+      uri: mongodb://127.0.0.1:60017/snip-it

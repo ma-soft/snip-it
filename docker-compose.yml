@@ -2,13 +2,21 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo
+    image: ${MONGO_VERIONS-mongo:4.4.2}
     container_name: 'snip-it-db'
+    hostname: mongo
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${SNIP_IT_DB_USER-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${SNIP_IT_DB_PASSWORD-password}
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - '60017:27017'
+    expose:
+      - 60017
     volumes:
       - ./database-data:/data/db
+    networks:
+      - gateway
+
+networks:
+  gateway:
