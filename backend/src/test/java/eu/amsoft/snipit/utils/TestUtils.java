@@ -14,35 +14,39 @@ public class TestUtils {
         // empêche l'instanciation de la classe
     }
 
+    public static SnippetDto getRandomSnippetDto() {
+        return SnippetDto
+                .builder()
+                .id(UUID.randomUUID().toString())
+                .title(RandomStringUtils.randomAlphanumeric(10))
+                .content(RandomStringUtils.randomAlphanumeric(100))
+                .build();
+    }
+
     public static List<SnippetDto> getRandomSnippetDtoList(final int size) {
         final List<SnippetDto> dtos = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
-            dtos.add(
-                    SnippetDto
-                            .builder()
-                            .id(UUID.randomUUID().toString())
-                            .title(RandomStringUtils.randomAlphanumeric(10))
-                            .content(RandomStringUtils.randomAlphanumeric(100))
-                            .build()
-            );
+            dtos.add(getRandomSnippetDto());
         }
 
         return dtos;
+    }
+
+    public static SnippetModel getRandomSnippetModel() {
+        return SnippetModel
+                .builder()
+                .id(UUID.randomUUID().toString())
+                .title(RandomStringUtils.randomAlphanumeric(10))
+                .content(RandomStringUtils.randomAlphanumeric(100))
+                .build();
     }
 
     public static List<SnippetModel> getRandomSnippetModelList(final int size) {
         final List<SnippetModel> models = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
-            models.add(
-                    SnippetModel
-                            .builder()
-                            .id(UUID.randomUUID().toString())
-                            .title(RandomStringUtils.randomAlphanumeric(10))
-                            .content(RandomStringUtils.randomAlphanumeric(100))
-                            .build()
-            );
+            models.add(getRandomSnippetModel());
         }
 
         return models;
