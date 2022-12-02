@@ -1,5 +1,6 @@
 package eu.amsoft.snipit.services;
 
+import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.mappers.SnippetMapper;
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.repositories.SnippetRepository;
@@ -20,4 +21,9 @@ public class SnippetService {
         return page.map(SnippetMapper.INSTANCE::toSnippetDto);
     }
 
+    public SnippetDto getById(final String id) throws EntityNotFoundException {
+        final SnippetModel snippetModel = snippetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(SnippetModel.class, id));
+        return SnippetMapper.INSTANCE.toSnippetDto(snippetModel);
+    }
 }
