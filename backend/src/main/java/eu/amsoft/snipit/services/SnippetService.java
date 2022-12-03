@@ -17,18 +17,34 @@ public class SnippetService {
     private final SnippetRepository snippetRepository;
 
     public Page<SnippetDto> getAll(final Pageable pageable) {
-        final Page<SnippetModel> page = snippetRepository.findAll(pageable);
-        return page.map(SnippetMapper.INSTANCE::toSnippetDto);
+        return snippetRepository.findAll(pageable)
+                .map(SnippetMapper.INSTANCE::toSnippetDto);
     }
 
     public SnippetDto getById(final String id) throws EntityNotFoundException {
-        final SnippetModel snippetModel = snippetRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(SnippetModel.class, id));
-        return SnippetMapper.INSTANCE.toSnippetDto(snippetModel);
+        return SnippetMapper.INSTANCE.toSnippetDto(
+                // ne peut jamais être null car si n'existe pas, alors envoie d'exception
+                getByIdOrElseThrow(id)
+        );
     }
 
     public SnippetDto createSnippet(final SnippetDto snippetDto) {
         final SnippetModel snippetModel = SnippetMapper.INSTANCE.toSnippetModel(snippetDto);
-        return SnippetMapper.INSTANCE.toSnippetDto(snippetRepository.save(snippetModel));
+        
+        return SnippetMapper.INSTANCE.toSnippetDto(
+                snippetRepository.save(snippetModel)
+        );
+    }
+
+    public void deleteById(final String id) throws EntityNotFoundException {
+        snippetRepository.deleteById(
+                // ne peut jamais être null car si n'existe pas, alors envoie d'exception
+                getByIdOrElseThrow(id).getId()
+        );
+    }
+
+    private SnippetModel getByIdOrElseThrow(final String id) throws EntityNotFoundException {
+        return snippetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(SnippetModel.class, id));
     }
 }
