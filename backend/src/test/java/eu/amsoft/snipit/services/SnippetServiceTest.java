@@ -4,6 +4,7 @@ import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.repositories.SnippetRepository;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("SnippetService")
 class SnippetServiceTest {
 
     @Mock
@@ -40,8 +42,10 @@ class SnippetServiceTest {
     SnippetService snippetService;
 
     @Nested
+    @DisplayName("SnippetService#getAllSnippets")
     class GetAllSnippetTest {
         @Test
+        @DisplayName("Une paginée de snippets doit être renvoyée")
         void should_list_all_snippets() {
             // given
             final Pageable pageable = PageRequest.of(0, 10);
@@ -58,9 +62,11 @@ class SnippetServiceTest {
     }
 
     @Nested
+    @DisplayName("SnippetService#getSnippetById")
     class GetSnippetByIdTest {
 
         @Test
+        @DisplayName("Un snippet doit être retourné quand son identifiant existe")
         void should_get_snippet_when_id_exists() throws EntityNotFoundException {
             // given
             final SnippetModel model = getRandomSnippetModel();
@@ -77,6 +83,7 @@ class SnippetServiceTest {
         }
 
         @Test
+        @DisplayName("Une exception doit être lancée quand on recherche un identifiant qui n'existe pas")
         void should_throw_exception_when_snippet_not_found() {
             // given
             final String id = randomAlphanumeric(10);
@@ -91,8 +98,10 @@ class SnippetServiceTest {
     }
 
     @Nested
+    @DisplayName("SnippetService#createSnippet")
     class CreateSnippetTest {
         @Test
+        @DisplayName("Un snippet doit être créé")
         void should_create_snippet() {
             // given
             final SnippetDto toSave = getRandomSnippetDto(false);
@@ -115,8 +124,10 @@ class SnippetServiceTest {
     }
 
     @Nested
+    @DisplayName("SnippetService#deleteSnippet")
     class DeleteSnippetTest {
         @Test
+        @DisplayName("Un snippet doit être supprimé quand son identifiant existe")
         void should_delete_snippet_when_exists() throws EntityNotFoundException {
             // given
             final SnippetModel snippetModel = getRandomSnippetModel();
@@ -130,6 +141,7 @@ class SnippetServiceTest {
         }
 
         @Test
+        @DisplayName("Une exception doit être lancée quand on tente de supprimer un snippet qui n'existe pas")
         void should_throw_exception_when_not_exists() {
             // given
             final String id = randomAlphanumeric(10);

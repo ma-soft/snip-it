@@ -2,6 +2,7 @@ package eu.amsoft.snipit.mappers;
 
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +11,12 @@ import static eu.amsoft.snipit.utils.TestUtils.getRandomSnippetModel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+
+@DisplayName("SnippetMapper")
 class SnippetMapperTest {
 
     @Nested
+    @DisplayName("SnippetMapper#toSnippetDto")
     class ToSnippetDto {
         @Test
         void should_map_to_dto() {
@@ -40,6 +44,7 @@ class SnippetMapperTest {
     }
 
     @Nested
+    @DisplayName("SnippetMapper#toSnippetModel")
     class ToSnippetModel {
         @Test
         void should_map_to_model() {

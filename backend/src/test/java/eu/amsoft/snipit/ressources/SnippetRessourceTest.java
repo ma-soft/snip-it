@@ -4,6 +4,7 @@ import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
 import eu.amsoft.snipit.services.SnippetService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @WebMvcTest(SnippetRessource.class)
+@DisplayName("SnippetRessource")
 class SnippetRessourceTest {
 
     @Autowired
@@ -49,8 +51,10 @@ class SnippetRessourceTest {
     private String contextPath;
 
     @Nested
+    @DisplayName("SnippetRessource#getAllSnippets")
     class GetAllSnippetsTest {
         @Test
+        @DisplayName("Une liste paginée doit être transmise, avec un code HTTP 200")
         void should_get_pagination_of_snippets() throws Exception {
             // given
             final List<SnippetDto> expectedResults = getRandomSnippetDtoList(50);
@@ -78,6 +82,7 @@ class SnippetRessourceTest {
         }
 
         @Test
+        @DisplayName("Une liste vide paginée doit être transmise si aucun snippet n'est encore stocké, avec un code HTTP 200")
         void should_get_empty_when_no_snippet() throws Exception {
             // given
             given(snippetService.getAll(any(Pageable.class))).willReturn(Page.empty());
@@ -98,8 +103,10 @@ class SnippetRessourceTest {
     }
 
     @Nested
+    @DisplayName("SnippetRessource#getSnippetById")
     class GetSnippetByIdTest {
         @Test
+        @DisplayName("Un snippet doit être transmis s'il existe, avec un code HTTP 200")
         void should_get_snippet_with_id_when_exists() throws Exception {
             // given
             final SnippetDto expectedSnippetDto = getRandomSnippetDto();
@@ -122,6 +129,7 @@ class SnippetRessourceTest {
         }
 
         @Test
+        @DisplayName("Une ExceptionResponse doit être transmise, avec un code retour 404")
         void should_get_404_when_id_not_exists() throws Exception {
             // given
             final String id = randomAlphanumeric(10);
@@ -144,8 +152,10 @@ class SnippetRessourceTest {
     }
 
     @Nested
+    @DisplayName("SnippetRessource#createSnippet")
     class CreateSnippetTest {
         @Test
+        @DisplayName("Un snippet doit être transmis, avec un code retour 200")
         void should_get_created_snippet_with_id() throws Exception {
             // given
             final SnippetDto sentDto = getRandomSnippetDto(false);
@@ -175,8 +185,10 @@ class SnippetRessourceTest {
     }
 
     @Nested
+    @DisplayName("SnippetRessource#deleteSnippet")
     class DeleteSnippetTest {
         @Test
+        @DisplayName("Un code retour 204 doit être transmis si le snippet existe")
         void should_delete_snippet_when_exists() throws Exception {
             // given
             final String id = randomAlphanumeric(10);
@@ -194,6 +206,7 @@ class SnippetRessourceTest {
         }
 
         @Test
+        @DisplayName("Une ExceptionResponse doit être transmise avec un code 404 si le snippet n'existe pas")
         void should_get_404_when_not_exists() throws Exception {
             // given
             final String id = randomAlphanumeric(10);
