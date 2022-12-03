@@ -26,14 +26,13 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
@@ -103,17 +102,21 @@ class SnippetRessourceTest {
         @Test
         void should_get_snippet_with_id_when_exists() throws Exception {
             // given
-            final String id = randomAlphanumeric(10);
-            given(snippetService.getById(anyString())).willReturn(SnippetDto.builder().id(id).build());
+            final SnippetDto expectedSnippetDto = getRandomSnippetDto();
+            given(snippetService.getById(anyString())).willReturn(expectedSnippetDto);
 
             // when
-            final ResultActions response = mvc.perform(get(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id)));
+            final ResultActions response = mvc.perform(
+                    get(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, expectedSnippetDto.getId()))
+            );
 
             // then
             response
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.id", is(id)));
+                    .andExpect(jsonPath("$.id", is(expectedSnippetDto.getId())))
+                    .andExpect(jsonPath("$.title", is(expectedSnippetDto.getTitle())))
+                    .andExpect(jsonPath("$.content", is(expectedSnippetDto.getContent())));
 
             verify(snippetService, times(1)).getById(anyString());
         }
@@ -122,9 +125,8 @@ class SnippetRessourceTest {
         void should_get_404_when_id_not_exists() throws Exception {
             // given
             final String id = randomAlphanumeric(10);
-            final int expectedHttpStatusCode = NOT_FOUND.value();
-            final String expectedErrorMessage = format("%s {id: %s} not found.", SnippetModel.class.getName(), id);
-            given(snippetService.getById(anyString())).willThrow(new EntityNotFoundException(SnippetModel.class, id));
+            final EntityNotFoundException entityNotFoundException = new EntityNotFoundException(SnippetModel.class, id);
+            given(snippetService.getById(anyString())).willThrow(entityNotFoundException);
 
             // when
             final ResultActions response = mvc.perform(get(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id)));
@@ -133,8 +135,8 @@ class SnippetRessourceTest {
             response
                     .andExpect(status().isNotFound())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.errorCode", is(expectedHttpStatusCode)))
-                    .andExpect(jsonPath("$.errorMessage", is(expectedErrorMessage)))
+                    .andExpect(jsonPath("$.errorCode", is(NOT_FOUND.value())))
+                    .andExpect(jsonPath("$.errorMessage", is(entityNotFoundException.getMessage())))
                     .andReturn();
 
             verify(snippetService, times(1)).getById(anyString());
@@ -170,6 +172,47 @@ class SnippetRessourceTest {
 
             verify(snippetService, times(1)).createSnippet(any(SnippetDto.class));
         }
+    }
 
+    @Nested
+    class DeleteSnippetTest {
+        @Test
+        void should_delete_snippet_when_exists() throws Exception {
+            // given
+            willDoNothing().given(snippetService).deleteById(anyString());
+
+            // when
+            final ResultActions response = mvc.perform(
+                    delete(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, randomAlphanumeric(10)))
+            );
+
+            // then
+            response.andExpect(status().isNoContent());
+
+            verify(snippetService, times(1)).deleteById(anyString());
+        }
+
+        @Test
+        void should_get_404_when_not_exists() throws Exception {
+            // given
+            final String id = randomAlphanumeric(10);
+            final EntityNotFoundException entityNotFoundException = new EntityNotFoundException(SnippetModel.class, id);
+            willThrow(entityNotFoundException).given(snippetService).deleteById(anyString());
+
+            // when
+            final ResultActions response = mvc.perform(
+                    delete(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id))
+            );
+
+            // then
+            response
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.errorCode", is(NOT_FOUND.value())))
+                    .andExpect(jsonPath("$.errorMessage", is(entityNotFoundException.getMessage())))
+                    .andReturn();
+
+            verify(snippetService, times(1)).deleteById(anyString());
+        }
     }
 }

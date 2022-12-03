@@ -71,4 +71,10 @@ public class SnippetRessource {
         final URI location = fromPath(itemUri).buildAndExpand(result.getId()).toUri();
         return ResponseEntity.created(location).body(result);
     }
+
+    @DeleteMapping(GET_SNIPPET_BY_ID)
+    public ResponseEntity<?> deleteSnippet(@PathVariable final String id) throws EntityNotFoundException {
+        snippetService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
