@@ -45,6 +45,7 @@
         <lombok.verion>1.18.24</lombok.verion>
         <jacoco.version>0.8.7</jacoco.version>
         <jackson-databind.version>2.14.0</jackson-databind.version>
+        <springfox.version>3.0.0</springfox.version>
 
         <!-- front variables -->
         <node.version>v16.17.1</node.version>
