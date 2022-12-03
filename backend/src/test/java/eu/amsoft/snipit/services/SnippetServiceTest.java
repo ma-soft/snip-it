@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +111,37 @@ class SnippetServiceTest {
             assertThat(snippet.getId(), notNullValue());
             assertThat(snippet.getTitle(), is(toSave.getTitle()));
             assertThat(snippet.getContent(), is(toSave.getContent()));
+        }
+    }
+
+    @Nested
+    class DeleteSnippetTest {
+        @Test
+        void should_delete_snippet_when_exists() throws EntityNotFoundException {
+            // given
+            final SnippetModel snippetModel = getRandomSnippetModel();
+            given(snippetRepository.findById(anyString())).willReturn(of(snippetModel));
+
+            // when
+            snippetService.deleteById(snippetModel.getId());
+
+            // then
+            verify(snippetRepository, times(1)).deleteById(snippetModel.getId());
+        }
+
+        @Test
+        void should_throw_exception_when_not_exists() {
+            // given
+            final String id = randomAlphanumeric(10);
+            final EntityNotFoundException expectedException = new EntityNotFoundException(SnippetModel.class, id);
+            given(snippetRepository.findById(anyString())).willReturn(empty());
+
+            // when
+            final EntityNotFoundException capturedException = assertThrows(EntityNotFoundException.class, () -> snippetService.getById(id));
+
+            // then
+            assertThat(capturedException.getMessage(), is(expectedException.getMessage()));
+            assertThat(capturedException, isA(EntityNotFoundException.class));
         }
     }
 }

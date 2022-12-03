@@ -179,17 +179,18 @@ class SnippetRessourceTest {
         @Test
         void should_delete_snippet_when_exists() throws Exception {
             // given
-            willDoNothing().given(snippetService).deleteById(anyString());
+            final String id = randomAlphanumeric(10);
+            willDoNothing().given(snippetService).deleteById(id);
 
             // when
             final ResultActions response = mvc.perform(
-                    delete(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, randomAlphanumeric(10)))
+                    delete(format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id))
             );
 
             // then
             response.andExpect(status().isNoContent());
 
-            verify(snippetService, times(1)).deleteById(anyString());
+            verify(snippetService, times(1)).deleteById(id);
         }
 
         @Test
@@ -212,7 +213,7 @@ class SnippetRessourceTest {
                     .andExpect(jsonPath("$.errorMessage", is(entityNotFoundException.getMessage())))
                     .andReturn();
 
-            verify(snippetService, times(1)).deleteById(anyString());
+            verify(snippetService, times(1)).deleteById(id);
         }
     }
 }
