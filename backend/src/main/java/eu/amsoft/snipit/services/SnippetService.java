@@ -28,11 +28,11 @@ public class SnippetService {
         );
     }
 
-    public SnippetDto createSnippet(final SnippetDto snippetDto) {
-        final SnippetModel snippetModel = SnippetMapper.INSTANCE.toSnippetModel(snippetDto);
+    public SnippetDto createSnippet(final SnippetDto dto) {
+        final SnippetModel model = SnippetMapper.INSTANCE.toSnippetModel(dto);
 
         return SnippetMapper.INSTANCE.toSnippetDto(
-                snippetRepository.save(snippetModel)
+                snippetRepository.save(model)
         );
     }
 
@@ -40,6 +40,17 @@ public class SnippetService {
         snippetRepository.deleteById(
                 // ne peut jamais être null car si n'existe pas, alors envoi d'exception
                 getByIdOrElseThrow(id).getId()
+        );
+    }
+
+    public SnippetDto updateSnippet(final SnippetDto dto) throws EntityNotFoundException {
+        final String id = dto.getId();
+        if (id == null || !snippetRepository.existsById(id)) {
+            throw new EntityNotFoundException(SnippetModel.class, id);
+        }
+
+        return SnippetMapper.INSTANCE.toSnippetDto(
+                snippetRepository.save(SnippetMapper.INSTANCE.toSnippetModel(dto))
         );
     }
 

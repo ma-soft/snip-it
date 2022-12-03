@@ -229,4 +229,55 @@ class SnippetRessourceTest {
             verify(snippetService, times(1)).deleteById(id);
         }
     }
+
+    @Nested
+    @DisplayName("SnippetRessource#updateSnippet")
+    class UpdateSnippetTest {
+        @Test
+        @DisplayName("Un snippet équivalent à celui envoyé doit être transmis, avec un code HTTP 200")
+        void should_update_snippet_if_exists() throws Exception {
+            // given
+            final SnippetDto dto = getRandomSnippetDto();
+            given(snippetService.updateSnippet(any(SnippetDto.class))).willReturn(dto);
+
+            // when
+            final ResultActions response = mvc.perform(
+                    put(SNIPPET_RESSOURCE_BASE_URI).content(toJson(dto)).accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+            );
+
+            // then
+            response
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.id", equalTo(dto.getId())))
+                    .andExpect(jsonPath("$.title", equalTo(dto.getTitle())))
+                    .andExpect(jsonPath("$.content", equalTo(dto.getContent())));
+
+            verify(snippetService, times(1)).updateSnippet(any(SnippetDto.class));
+        }
+
+        @Test
+        @DisplayName("Une ExceptionResponse doit être transmise, avec un code retour 404 si le snippet n'existe pas")
+        void should_get_404_when_snippet_not_exists() throws Exception {
+            // given
+            final SnippetDto dto = getRandomSnippetDto();
+            final EntityNotFoundException entityNotFoundException = new EntityNotFoundException(SnippetModel.class, dto.getId());
+            given(snippetService.updateSnippet(any(SnippetDto.class))).willThrow(entityNotFoundException);
+
+            // when
+            final ResultActions response = mvc.perform(
+                    put(SNIPPET_RESSOURCE_BASE_URI).content(toJson(dto)).accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+            );
+
+            // then
+            response
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.errorCode", is(NOT_FOUND.value())))
+                    .andExpect(jsonPath("$.errorMessage", is(entityNotFoundException.getMessage())))
+                    .andReturn();
+
+            verify(snippetService, times(1)).updateSnippet(any(SnippetDto.class));
+        }
+    }
 }

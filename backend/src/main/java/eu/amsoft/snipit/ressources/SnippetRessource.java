@@ -23,6 +23,7 @@ import static eu.amsoft.snipit.utils.Uris.SNIPPET_RESSOURCE_BASE_URI;
 import static java.lang.String.format;
 import static org.springframework.data.domain.Sort.Direction;
 import static org.springframework.data.domain.Sort.by;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 
 @RestController
@@ -64,6 +65,7 @@ public class SnippetRessource {
     }
 
     @PostMapping
+    @ResponseStatus(CREATED)
     @ApiOperation(value = "Enregistre un snippet")
     public ResponseEntity<SnippetDto> createSnippet(@RequestBody final SnippetDto snippetDto) {
         final SnippetDto result = snippetService.createSnippet(snippetDto);
@@ -76,5 +78,11 @@ public class SnippetRessource {
     public ResponseEntity<?> deleteSnippet(@PathVariable final String id) throws EntityNotFoundException {
         snippetService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    @ApiOperation("Met à jour un snippet déjà existant")
+    public ResponseEntity<SnippetDto> updateSnippet(@RequestBody final SnippetDto snippetDto) throws EntityNotFoundException {
+        return ResponseEntity.ok(snippetService.updateSnippet(snippetDto));
     }
 }

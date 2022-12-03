@@ -156,4 +156,65 @@ class SnippetServiceTest {
             assertThat(capturedException, isA(EntityNotFoundException.class));
         }
     }
+
+    @Nested
+    @DisplayName("SnippetService#updateSnippet")
+    class UpdateSnippetTest {
+        @Test
+        @DisplayName("Un snippet xdto correspondant à celui en paramètres doit être retourné si le snippet existe")
+        void should_return_same_dto_when_exists() throws EntityNotFoundException {
+            // given
+            final SnippetDto initialDto = getRandomSnippetDto();
+            final SnippetModel model = SnippetModel.builder()
+                    .id(initialDto.getId())
+                    .content(initialDto.getContent())
+                    .title(initialDto.getTitle())
+                    .build();
+            given(snippetRepository.existsById(anyString())).willReturn(true);
+            given(snippetRepository.save(any(SnippetModel.class))).willReturn(model);
+
+            // when
+            final SnippetDto resultDto = snippetService.updateSnippet(initialDto);
+
+            // then
+            assertThat(resultDto, notNullValue());
+            assertThat(resultDto.getId(), is(initialDto.getId()));
+            assertThat(resultDto.getContent(), is(initialDto.getContent()));
+            assertThat(resultDto.getTitle(), is(initialDto.getTitle()));
+
+            verify(snippetRepository, times(1)).save(any(SnippetModel.class));
+        }
+
+        @Test
+        @DisplayName("Une exception doit être lancée quand on tente de modifier un snippet qui n'existe pas")
+        void should_throw_exception_when_snippet_not_exists() throws EntityNotFoundException {
+            // given
+            final SnippetDto dto = getRandomSnippetDto();
+            final EntityNotFoundException expectedException = new EntityNotFoundException(SnippetModel.class, dto.getId());
+            given(snippetRepository.existsById(anyString())).willReturn(false);
+
+            // when
+            final EntityNotFoundException capturedException = assertThrows(EntityNotFoundException.class, () -> snippetService.updateSnippet(dto));
+
+            // then
+            assertThat(capturedException.getMessage(), is(expectedException.getMessage()));
+            assertThat(capturedException, isA(EntityNotFoundException.class));
+
+        }
+
+        @Test
+        @DisplayName("Une exception doit être lancée quand on tente de modifier un snippet à l'aide d'un Id null")
+        void should_throw_exception_when_id_is_null() throws EntityNotFoundException {
+            // given
+            final SnippetDto dto = getRandomSnippetDto(false);
+            final EntityNotFoundException expectedException = new EntityNotFoundException(SnippetModel.class, dto.getId());
+
+            // when
+            final EntityNotFoundException capturedException = assertThrows(EntityNotFoundException.class, () -> snippetService.updateSnippet(dto));
+
+            // then
+            assertThat(capturedException.getMessage(), is(expectedException.getMessage()));
+            assertThat(capturedException, isA(EntityNotFoundException.class));
+        }
+    }
 }
