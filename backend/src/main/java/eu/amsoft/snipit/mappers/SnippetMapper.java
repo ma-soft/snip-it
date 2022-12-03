@@ -10,5 +10,7 @@ public interface SnippetMapper {
 
     SnippetMapper INSTANCE = Mappers.getMapper(SnippetMapper.class);
 
-    SnippetDto toSnippetDto(final SnippetModel snippet);
+    SnippetDto toSnippetDto(final SnippetModel model);
+
+    SnippetModel toSnippetModel(final SnippetDto dto);
 }

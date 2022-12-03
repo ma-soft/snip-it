@@ -26,4 +26,9 @@ public class SnippetService {
                 .orElseThrow(() -> new EntityNotFoundException(SnippetModel.class, id));
         return SnippetMapper.INSTANCE.toSnippetDto(snippetModel);
     }
+
+    public SnippetDto createSnippet(final SnippetDto snippetDto) {
+        final SnippetModel snippetModel = SnippetMapper.INSTANCE.toSnippetModel(snippetDto);
+        return SnippetMapper.INSTANCE.toSnippetDto(snippetRepository.save(snippetModel));
+    }
 }
