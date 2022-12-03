@@ -2,11 +2,11 @@ package eu.amsoft.snipit.utils;
 
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 public class TestUtils {
 
@@ -15,11 +15,15 @@ public class TestUtils {
     }
 
     public static SnippetDto getRandomSnippetDto() {
+        return getRandomSnippetDto(true);
+    }
+
+    public static SnippetDto getRandomSnippetDto(final boolean withId) {
         return SnippetDto
                 .builder()
-                .id(UUID.randomUUID().toString())
-                .title(RandomStringUtils.randomAlphanumeric(10))
-                .content(RandomStringUtils.randomAlphanumeric(100))
+                .id(withId ? randomAlphanumeric(10) : null)
+                .title(randomAlphanumeric(20))
+                .content(randomAlphanumeric(100))
                 .build();
     }
 
@@ -34,11 +38,15 @@ public class TestUtils {
     }
 
     public static SnippetModel getRandomSnippetModel() {
+        return getRandomSnippetModel(true);
+    }
+
+    public static SnippetModel getRandomSnippetModel(final boolean withId) {
         return SnippetModel
                 .builder()
-                .id(UUID.randomUUID().toString())
-                .title(RandomStringUtils.randomAlphanumeric(10))
-                .content(RandomStringUtils.randomAlphanumeric(100))
+                .id(withId ? randomAlphanumeric(10) : null)
+                .title(randomAlphanumeric(20))
+                .content(randomAlphanumeric(100))
                 .build();
     }
 

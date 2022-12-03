@@ -7,6 +7,7 @@ import eu.amsoft.snipit.services.SnippetService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -17,19 +18,22 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static eu.amsoft.snipit.utils.JsonMapper.toJson;
+import static eu.amsoft.snipit.utils.TestUtils.getRandomSnippetDto;
 import static eu.amsoft.snipit.utils.TestUtils.getRandomSnippetDtoList;
 import static eu.amsoft.snipit.utils.Uris.SNIPPET_RESSOURCE_BASE_URI;
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.emptyCollectionOf;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
@@ -41,6 +45,9 @@ class SnippetRessourceTest {
 
     @MockBean
     SnippetService snippetService;
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
 
     @Nested
     class GetAllSnippetsTest {
@@ -57,8 +64,7 @@ class SnippetRessourceTest {
             response
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.numberOfElements", is(expectedResults.size())))
-                    .andReturn().getResponse();
+                    .andExpect(jsonPath("$.numberOfElements", is(expectedResults.size())));
 
             for (int i = 0; i < expectedResults.size(); i++) {
                 final String contentPath = format("$.content[%d]", i);
@@ -107,8 +113,9 @@ class SnippetRessourceTest {
             response
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.id", is(id)))
-                    .andReturn();
+                    .andExpect(jsonPath("$.id", is(id)));
+
+            verify(snippetService, times(1)).getById(anyString());
         }
 
         @Test
@@ -129,6 +136,40 @@ class SnippetRessourceTest {
                     .andExpect(jsonPath("$.errorCode", is(expectedHttpStatusCode)))
                     .andExpect(jsonPath("$.errorMessage", is(expectedErrorMessage)))
                     .andReturn();
+
+            verify(snippetService, times(1)).getById(anyString());
         }
+    }
+
+    @Nested
+    class CreateSnippetTest {
+        @Test
+        void should_get_created_snippet_with_id() throws Exception {
+            // given
+            final SnippetDto sentDto = getRandomSnippetDto(false);
+            final String id = randomAlphanumeric(10);
+            final String locationExpected = contextPath + format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id);
+            final SnippetDto savedDto = SnippetDto.builder()
+                    .id(id)
+                    .title(sentDto.getTitle())
+                    .content(sentDto.getContent()).build();
+            given(snippetService.createSnippet(any(SnippetDto.class))).willReturn(savedDto);
+
+            // when
+            final ResultActions response = mvc.perform(
+                    post(SNIPPET_RESSOURCE_BASE_URI).content(toJson(sentDto)).accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+            );
+
+            // then
+            response
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.id").exists())
+                    .andExpect(header().exists("Location"))
+                    .andExpect(header().string("Location", equalTo(locationExpected)));
+
+            verify(snippetService, times(1)).createSnippet(any(SnippetDto.class));
+        }
+
     }
 }

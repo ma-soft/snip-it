@@ -3,13 +3,11 @@ package eu.amsoft.snipit.ressources.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@ToString
 public class ExceptionResponse {
 
     // Le message que l'on veut afficher à l'utiliseur (front)
