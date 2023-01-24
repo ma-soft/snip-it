@@ -4,6 +4,7 @@ import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.repositories.SnippetRepository;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
+import eu.amsoft.snipit.ressources.dto.SnippetRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static eu.amsoft.snipit.utils.TestUtils.*;
+import static java.time.LocalDateTime.now;
+import static java.time.LocalDateTime.of;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,7 +35,6 @@ import static org.mockito.Mockito.verify;
 import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SnippetService")
 class SnippetServiceTest {
 
     @Mock
@@ -104,22 +106,22 @@ class SnippetServiceTest {
         @DisplayName("Un snippet doit être créé")
         void should_create_snippet() {
             // given
-            final SnippetDto toSave = getRandomSnippetDto(false);
+            final SnippetRequest request = getRandomSnippetRequest();
             final SnippetModel model = SnippetModel.builder()
                     .id(randomAlphanumeric(10))
-                    .title(toSave.getTitle())
-                    .content(toSave.getContent())
+                    .title(request.getTitle())
+                    .content(request.getContent())
                     .build();
             given(snippetRepository.save(any(SnippetModel.class))).willReturn(model);
 
             // when
-            final SnippetDto snippet = snippetService.createSnippet(toSave);
+            final SnippetDto snippet = snippetService.createSnippet(request);
 
             // then
             assertThat(snippet, notNullValue());
             assertThat(snippet.getId(), notNullValue());
-            assertThat(snippet.getTitle(), is(toSave.getTitle()));
-            assertThat(snippet.getContent(), is(toSave.getContent()));
+            assertThat(snippet.getTitle(), is(request.getTitle()));
+            assertThat(snippet.getContent(), is(request.getContent()));
         }
     }
 
@@ -161,17 +163,26 @@ class SnippetServiceTest {
     @DisplayName("SnippetService#updateSnippet")
     class UpdateSnippetTest {
         @Test
-        @DisplayName("Un snippet xdto correspondant à celui en paramètres doit être retourné si le snippet existe")
+        @DisplayName("Un snippetDto correspondant à celui en paramètres doit être retourné si le snippet existe avec une date de modification non nulle")
         void should_return_same_dto_when_exists() throws EntityNotFoundException {
             // given
             final SnippetDto initialDto = getRandomSnippetDto();
-            final SnippetModel model = SnippetModel.builder()
+            final SnippetModel modelInitial = SnippetModel.builder()
                     .id(initialDto.getId())
                     .content(initialDto.getContent())
                     .title(initialDto.getTitle())
+                    .createdAt(of(2022, 12, 12, 12, 12, 12))
                     .build();
-            given(snippetRepository.existsById(anyString())).willReturn(true);
-            given(snippetRepository.save(any(SnippetModel.class))).willReturn(model);
+            final SnippetModel modelUpdated = SnippetModel.builder()
+                    .id(modelInitial.getId())
+                    .content(modelInitial.getContent())
+                    .title(modelInitial.getTitle())
+                    .createdAt(modelInitial.getCreatedAt())
+                    .updatedAt(now())
+                    .build();
+
+            given(snippetRepository.findById(anyString())).willReturn(of(modelInitial));
+            given(snippetRepository.save(any())).willReturn(modelUpdated);
 
             // when
             final SnippetDto resultDto = snippetService.updateSnippet(initialDto);
@@ -181,6 +192,8 @@ class SnippetServiceTest {
             assertThat(resultDto.getId(), is(initialDto.getId()));
             assertThat(resultDto.getContent(), is(initialDto.getContent()));
             assertThat(resultDto.getTitle(), is(initialDto.getTitle()));
+            assertThat(resultDto.getCreatedAt(), notNullValue());
+            assertThat(resultDto.getUpdatedAt(), notNullValue());
 
             verify(snippetRepository, times(1)).save(any(SnippetModel.class));
         }
@@ -206,7 +219,7 @@ class SnippetServiceTest {
         @DisplayName("Une exception doit être lancée quand on tente de modifier un snippet à l'aide d'un Id null")
         void should_throw_exception_when_id_is_null() throws EntityNotFoundException {
             // given
-            final SnippetDto dto = getRandomSnippetDto(false);
+            final SnippetDto dto = getRandomSnippetDto();
             final EntityNotFoundException expectedException = new EntityNotFoundException(SnippetModel.class, dto.getId());
 
             // when

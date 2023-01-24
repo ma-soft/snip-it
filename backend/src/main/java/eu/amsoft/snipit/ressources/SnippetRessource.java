@@ -2,6 +2,7 @@ package eu.amsoft.snipit.ressources;
 
 import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
+import eu.amsoft.snipit.ressources.dto.SnippetRequest;
 import eu.amsoft.snipit.services.SnippetService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +30,6 @@ import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 @RequiredArgsConstructor
 @RequestMapping(SNIPPET_RESSOURCE_BASE_URI)
 public class SnippetRessource {
-
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
 
     private final SnippetService snippetService;
 
@@ -67,9 +64,9 @@ public class SnippetRessource {
     @PostMapping
     @ResponseStatus(CREATED)
     @ApiOperation(value = "Enregistre un snippet")
-    public ResponseEntity<SnippetDto> createSnippet(@RequestBody final SnippetDto snippetDto) {
-        final SnippetDto result = snippetService.createSnippet(snippetDto);
-        final String itemUri = contextPath + format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, result.getId());
+    public ResponseEntity<SnippetDto> createSnippet(@RequestBody final SnippetRequest request) {
+        final SnippetDto result = snippetService.createSnippet(request);
+        final String itemUri = format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, result.getId());
         final URI location = fromPath(itemUri).buildAndExpand(result.getId()).toUri();
         return ResponseEntity.created(location).body(result);
     }

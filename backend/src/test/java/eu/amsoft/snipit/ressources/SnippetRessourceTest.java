@@ -3,12 +3,12 @@ package eu.amsoft.snipit.ressources;
 import eu.amsoft.snipit.exception.EntityNotFoundException;
 import eu.amsoft.snipit.models.SnippetModel;
 import eu.amsoft.snipit.ressources.dto.SnippetDto;
+import eu.amsoft.snipit.ressources.dto.SnippetRequest;
 import eu.amsoft.snipit.services.SnippetService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -20,10 +20,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 
 import static eu.amsoft.snipit.utils.JsonMapper.toJson;
-import static eu.amsoft.snipit.utils.TestUtils.getRandomSnippetDto;
-import static eu.amsoft.snipit.utils.TestUtils.getRandomSnippetDtoList;
+import static eu.amsoft.snipit.utils.TestUtils.*;
 import static eu.amsoft.snipit.utils.Uris.SNIPPET_RESSOURCE_BASE_URI;
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,9 +46,6 @@ class SnippetRessourceTest {
 
     @MockBean
     SnippetService snippetService;
-
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
 
     @Nested
     @DisplayName("SnippetRessource#getAllSnippets")
@@ -158,18 +155,20 @@ class SnippetRessourceTest {
         @DisplayName("Un snippet doit être transmis, avec un code retour 200")
         void should_get_created_snippet_with_id() throws Exception {
             // given
-            final SnippetDto sentDto = getRandomSnippetDto(false);
             final String id = randomAlphanumeric(10);
-            final String locationExpected = contextPath + format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id);
-            final SnippetDto savedDto = SnippetDto.builder()
+            final String locationExpected = format("%s/%s", SNIPPET_RESSOURCE_BASE_URI, id);
+            final SnippetRequest request = getRandomSnippetRequest();
+            final SnippetDto snippetDto = SnippetDto.builder()
                     .id(id)
-                    .title(sentDto.getTitle())
-                    .content(sentDto.getContent()).build();
-            given(snippetService.createSnippet(any(SnippetDto.class))).willReturn(savedDto);
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .createdAt(now())
+                    .build();
+            given(snippetService.createSnippet(any(SnippetRequest.class))).willReturn(snippetDto);
 
             // when
             final ResultActions response = mvc.perform(
-                    post(SNIPPET_RESSOURCE_BASE_URI).content(toJson(sentDto)).accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
+                    post(SNIPPET_RESSOURCE_BASE_URI).content(toJson(request)).accept(APPLICATION_JSON).contentType(APPLICATION_JSON)
             );
 
             // then
@@ -177,10 +176,14 @@ class SnippetRessourceTest {
                     .andExpect(status().isCreated())
                     .andExpect(content().contentType(APPLICATION_JSON_VALUE))
                     .andExpect(jsonPath("$.id").exists())
+                    .andExpect(jsonPath("$.title", equalTo(request.getTitle())))
+                    .andExpect(jsonPath("$.createdAt", equalTo(snippetDto.getCreatedAt().toString())))
+                    .andExpect(jsonPath("$.updatedAt", nullValue()))
+                    .andExpect(jsonPath("$.content", equalTo(request.getContent())))
                     .andExpect(header().exists("Location"))
                     .andExpect(header().string("Location", equalTo(locationExpected)));
 
-            verify(snippetService, times(1)).createSnippet(any(SnippetDto.class));
+            verify(snippetService, times(1)).createSnippet(any(SnippetRequest.class));
         }
     }
 

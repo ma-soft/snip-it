@@ -5,7 +5,7 @@ import eu.amsoft.snipit.ressources.dto.SnippetDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper()
 public interface SnippetMapper {
 
     SnippetMapper INSTANCE = Mappers.getMapper(SnippetMapper.class);
